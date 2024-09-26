@@ -213,10 +213,12 @@ def func_grad_u_f_2(theta, q, theta_dot, q_dot, F):
     return res
 
 def func_grad_x_f(theta, q, theta_dot, q_dot, F):
+    
     grad_theta_f_1     = func_grad_theta_f_1(theta, q, theta_dot, q_dot, F)
     grad_q_f_1         = func_grad_q_f_1(theta, q, theta_dot, q_dot, F)
     grad_theta_dot_f_1 = func_grad_theta_dot_f_1(theta, q, theta_dot, q_dot, F)
     grad_q_dot_f_1     = func_grad_q_dot_f_1(theta, q, theta_dot, q_dot, F)
+    
     grad_theta_f_2     = func_grad_theta_f_2(theta, q, theta_dot, q_dot, F)
     grad_q_f_2         = func_grad_q_f_2(theta, q, theta_dot, q_dot, F)
     grad_theta_dot_f_2 = func_grad_theta_dot_f_2(theta, q, theta_dot, q_dot, F)
@@ -227,18 +229,22 @@ def func_grad_x_f(theta, q, theta_dot, q_dot, F):
                          [grad_theta_f_1, grad_q_f_1, grad_theta_dot_f_1, grad_q_dot_f_1],
                          [grad_theta_f_2, grad_q_f_2, grad_theta_dot_f_2, grad_q_dot_f_2]
                         ]).astype(np.float64)
-    grad_x_f.shape == (4, 4)
+    assert grad_x_f.shape == (4, 4)
     return grad_x_f
 
 def func_grad_u_f(theta, q, theta_dot, q_dot, F):
+    
     grad_u_f_1 = func_grad_u_f_1(theta, q, theta_dot, q_dot, F)
+    
     grad_u_f_2 = func_grad_u_f_2(theta, q, theta_dot, q_dot, F)
+    
     grad_u_f = np.array([[0.0],
                          [0.0],
                          [grad_u_f_1],
                          [grad_u_f_2]
                         ]).astype(np.float64)
-    grad_u_f.shape == (4, 4)
+
+    assert grad_u_f.shape == (4, 1)
     return grad_u_f
 
 # f_1_sym, f_2_sym, grad_x_f_1_sym, grad_x_f_2_sym, grad_u_f_1_sym, grad_u_f_2_sym = find_analytical()
