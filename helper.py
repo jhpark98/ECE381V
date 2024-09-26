@@ -137,33 +137,36 @@ M_t = M + m
 J_t = J + m * l**2
 
 def func_f_1(theta, q, theta_dot, q_dot, F):
-    res = (-F*l*m*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) - 
-       M_t*g*l*m*math.sin(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-       M_t*gamma*theta_dot/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-       c*l*m*q_dot*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-       l**2*m**2*theta_dot**2*math.sin(theta)*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (-F*l*m*math.cos(theta)/(DET) - 
+       M_t*g*l*m*math.sin(theta)/(DET) + 
+       M_t*gamma*theta_dot/(DET) + 
+       c*l*m*q_dot*math.cos(theta)/(DET) + 
+       l**2*m**2*theta_dot**2*math.sin(theta)*math.cos(theta)/(DET))
     return res
 
 def func_f_2(theta, q, theta_dot, q_dot, F):
-    res = (-F*J_t/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-       J_t*c*q_dot/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-       J_t*l*m*theta_dot**2*math.sin(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) - 
-       g*l**2*m**2*math.sin(theta)*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-       gamma*l*m*theta_dot*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (-F*J_t/(DET) + 
+       J_t*c*q_dot/(DET) + 
+       J_t*l*m*theta_dot**2*math.sin(theta)/(DET) - 
+       g*l**2*m**2*math.sin(theta)*math.cos(theta)/(DET) + 
+       gamma*l*m*theta_dot*math.cos(theta)/(DET))
 
     return res
 
 def func_grad_theta_f_1(theta, q, theta_dot, q_dot, F):
-    res = (-2*F*l**3*m**3*math.sin(theta)*math.cos(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 + 
-         F*l*m*math.sin(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) - 
-         2*M_t*g*l**3*m**3*math.sin(theta)**2*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 - 
-         M_t*g*l*m*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-         2*M_t*gamma*l**2*m**2*theta_dot*math.sin(theta)*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 + 
-         2*c*l**3*m**3*q_dot*math.sin(theta)*math.cos(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 - 
-         c*l*m*q_dot*math.sin(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-         2*l**4*m**4*theta_dot**2*math.sin(theta)**2*math.cos(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 - 
-         l**2*m**2*theta_dot**2*math.sin(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-         l**2*m**2*theta_dot**2*math.cos(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (-2*F*l**3*m**3*math.sin(theta)*math.cos(theta)**2/(DET)**2 + 
+         F*l*m*math.sin(theta)/(DET) - 
+         2*M_t*g*l**3*m**3*math.sin(theta)**2*math.cos(theta)/(DET)**2 - 
+         M_t*g*l*m*math.cos(theta)/(DET) + 
+         2*M_t*gamma*l**2*m**2*theta_dot*math.sin(theta)*math.cos(theta)/(DET)**2 + 
+         2*c*l**3*m**3*q_dot*math.sin(theta)*math.cos(theta)**2/(DET)**2 - 
+         c*l*m*q_dot*math.sin(theta)/(DET) + 
+         2*l**4*m**4*theta_dot**2*math.sin(theta)**2*math.cos(theta)**2/(DET)**2 - 
+         l**2*m**2*theta_dot**2*math.sin(theta)**2/(DET) + 
+         l**2*m**2*theta_dot**2*math.cos(theta)**2/(DET))
     return res
 
 def func_grad_q_f_1(theta, q, theta_dot, q_dot, F):
@@ -171,24 +174,27 @@ def func_grad_q_f_1(theta, q, theta_dot, q_dot, F):
     return res
 
 def func_grad_theta_dot_f_1(theta, q, theta_dot, q_dot, F):
-    res = (M_t*gamma/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-             2*l**2*m**2*theta_dot*math.sin(theta)*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (M_t*gamma/(DET) + 
+             2*l**2*m**2*theta_dot*math.sin(theta)*math.cos(theta)/(DET))
     return res
 
 def func_grad_q_dot_f_1(theta, q, theta_dot, q_dot, F):
-    res = (c*l*m*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (c*l*m*math.cos(theta)/(DET))
     return res
 
 def func_grad_theta_f_2(theta, q, theta_dot, q_dot, F):
-    res = (-2*F*J_t*l**2*m**2*math.sin(theta)*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 + 
-         2*J_t*c*l**2*m**2*q_dot*math.sin(theta)*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 + 
-         2*J_t*l**3*m**3*theta_dot**2*math.sin(theta)**2*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 + 
-         J_t*l*m*theta_dot**2*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) - 
-         2*g*l**4*m**4*math.sin(theta)**2*math.cos(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 + 
-         g*l**2*m**2*math.sin(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) - 
-         g*l**2*m**2*math.cos(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-         2*gamma*l**3*m**3*theta_dot*math.sin(theta)*math.cos(theta)**2/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)**2 - 
-         gamma*l*m*theta_dot*math.sin(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (-2*F*J_t*l**2*m**2*math.sin(theta)*math.cos(theta)/(DET)**2 + 
+         2*J_t*c*l**2*m**2*q_dot*math.sin(theta)*math.cos(theta)/(DET)**2 + 
+         2*J_t*l**3*m**3*theta_dot**2*math.sin(theta)**2*math.cos(theta)/(DET)**2 + 
+         J_t*l*m*theta_dot**2*math.cos(theta)/(DET) - 
+         2*g*l**4*m**4*math.sin(theta)**2*math.cos(theta)**2/(DET)**2 + 
+         g*l**2*m**2*math.sin(theta)**2/(DET) - 
+         g*l**2*m**2*math.cos(theta)**2/(DET) + 
+         2*gamma*l**3*m**3*theta_dot*math.sin(theta)*math.cos(theta)**2/(DET)**2 - 
+         gamma*l*m*theta_dot*math.sin(theta)/(DET))
     return res
 
 def func_grad_q_f_2(theta, q, theta_dot, q_dot, F):
@@ -196,20 +202,24 @@ def func_grad_q_f_2(theta, q, theta_dot, q_dot, F):
     return res
 
 def func_grad_theta_dot_f_2(theta, q, theta_dot, q_dot, F):
-    res = (2*J_t*l*m*theta_dot*math.sin(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2) + 
-             gamma*l*m*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (2*J_t*l*m*theta_dot*math.sin(theta)/(DET) + 
+             gamma*l*m*math.cos(theta)/(DET))
     return res
 
 def func_grad_q_dot_f_2(theta, q, theta_dot, q_dot, F):
-    res = (J_t*c/(-J_t*M_t + l**2*m**2*math.cos(theta)**2))
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = (J_t*c/(DET))
     return res
 
 def func_grad_u_f_1(theta, q, theta_dot, q_dot, F):
-    res = -l*m*math.cos(theta)/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = -l*m*math.cos(theta)/(DET)
     return res
 
 def func_grad_u_f_2(theta, q, theta_dot, q_dot, F):
-    res = -J_t/(-J_t*M_t + l**2*m**2*math.cos(theta)**2)
+    DET = -J_t*M_t + l**2*m**2*math.cos(theta)**2
+    res = -J_t/(DET)
     return res
 
 def func_grad_x_f(theta, q, theta_dot, q_dot, F):
