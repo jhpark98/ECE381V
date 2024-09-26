@@ -42,8 +42,9 @@ class CartPole:
 
         # self.find_analytical()
 
+
     def next_step(self, x: np.ndarray, u: np.ndarray) -> np.ndarray:
-        """ h(x, u) """
+        """ h(x, u) full, non-linear dynamics """
         """
         For the given state and control, returns the next state
         Inputs:
@@ -52,6 +53,7 @@ class CartPole:
         Returns:
             x_next: 2D array of shape (n, 1)
         """
+        # state variables
         theta, q, theta_dot, q_dot, F = x[0, 0], x[1, 0], x[2, 0], x[3, 0], u[0, 0]
         # x_dot = f(x, u)
         x_dot = np.array([[x[2, 0]],
@@ -78,7 +80,7 @@ class CartPole:
         return res
 
     def approx_A_B(self, x: np.ndarray, u: np.ndarray) -> Tuple[np.ndarray]:
-        """ h(x_bar, u_bar) """
+        """ h(x_bar, u_bar), linearized about (x_bar, u_bar) """
         """
         For the given state and control, returns approximations of the A and B matrices
         Inputs:

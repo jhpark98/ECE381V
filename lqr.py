@@ -21,7 +21,6 @@ def lqr_dp(T, T_s, xu_bar, x_0, cartpole):
     Q_N = np.eye(4) * 100
     Q = np.eye(4)
     R = np.eye(1) * 0.1
-
     N = int(T / T_s)  # Number of time steps = 1000
 
     # Unpack

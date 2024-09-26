@@ -1,3 +1,5 @@
+import numpy as np
+
 def forward_pass_initial(x0, u_bar, T_s):
 
     N = u_bar.shape[1]   # Horizon length

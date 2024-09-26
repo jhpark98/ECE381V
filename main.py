@@ -25,7 +25,7 @@ def forward(x0, u_bar, cartpole, full=True):
     u_k = u_bar[k].reshape(-1,1) # (1, 1)
 
     if full: # non-linear dynamics
-      x[:, k + 1] = cartpole.next_step(x0, u_bar[0,0].reshape(-1, 1)).reshape(-1,)
+      x[:, k + 1] = cartpole.next_step(x_k, u_k).reshape(-1,)
     else:    # linearized dynamics
       x[:, k + 1] = (A @ x_k + B @ u_k).reshape(-1,)
   return x
@@ -34,18 +34,20 @@ def main():
     T = 10.0   # 10.0 seconds time horizon
     T_s = 0.01 # 50 ms sampling time
     N = int(T / T_s)  # number of time steps
-    
+
+
+    # NEED TO DEBUG - Make sure forward dynamics & 
     cartpole = CartPole(T_s) # Initialize environment
 
     x0 = np.array([0.0, 0.0, 0.0, 0.0]).reshape(-1, 1) # initial state (4, 1)
-    u_bar = np.random.normal(0, 0.5, N).reshape(-1, 1)   # random action (N, 1)
+    u_bar = np.array([0.1] * N).reshape(-1, 1)         # control input (N, 1)
     u_bar[0, 0] = 0.0
-    x_full = forward(x0, u_bar, cartpole, full=True)
-    x_lin = forward(x0, u_bar, cartpole, full=False)
+    x_full = forward(x0, u_bar, cartpole, full=True) # full dynamics
+    x_lin = forward(x0, u_bar, cartpole, full=False) # linear dynamics
+    
     plot_results(x_full.reshape(-1, 4), u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
     plot_results(x_lin.reshape(-1, 4), u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
 
-    print("Hello")
     import pdb; pdb.set_trace()
 
     # For LQR, start by estimating time-invariant matrices by linearizing the system around 0.
