@@ -2,6 +2,7 @@ import numpy as np
 from cartpole import CartPole
 from helper import plot_results
 from lqr import lqr_dp
+# from ilqr import iLQR
 # from lqr import ilqr
 
 def forward(x0, u_bar, cartpole, full=True):
@@ -49,15 +50,17 @@ def main():
     x_full = forward(x0, u_bar, cartpole, full=True) # full dynamics
     x_lin = forward(x0, u_bar, cartpole, full=False) # linear dynamics
     
-    plot_results(x_full.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
-    plot_results(x_lin.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
+    # plot_results(x_full.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
+    # plot_results(x_lin.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
+
+
     # a_dummy = np.ones(N+1).reshape(-1, 1)
     # b_dummy = a_dummy * 2.0
     # c_dummy = a_dummy * 3.0
     # d_dummy = a_dummy * 4.0
     # DUMMY = np.hstack([a_dummy, b_dummy, c_dummy, d_dummy]).reshape(-1, 4)
     # plot_results(DUMMY.reshape(-1, 4), u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
 
     # For LQR, start by estimating time-invariant matrices by linearizing the system around 0.
@@ -66,8 +69,11 @@ def main():
     xu_bar = (x_bar, u_bar)
 
     # Initial condition
-    x0_10_deg = np.array([10.0, 0.0, 0.0, 0.0]).reshape(-1, 1)
-    x0_30_deg = np.array([30.0, 0.0, 0.0, 0.0]).reshape(-1, 1)
+    # x0_10_deg = np.array([10.0, 0.0, 0.0, 0.0]).reshape(-1, 1)
+    # x0_30_deg = np.array([30.0, 0.0, 0.0, 0.0]).reshape(-1, 1)
+    
+    x0_10_deg = np.array([np.deg2rad(10.0), 0.0, 0.0, 0.0]).reshape(-1, 1)
+    x0_30_deg = np.array([np.deg2rad(30.0), 0.0, 0.0, 0.0]).reshape(-1, 1)
 
     # Call the LQR DP function
     x_traj_10, u_traj_10, cost_10, F_10, P_10 = lqr_dp(T, T_s, xu_bar, x0_10_deg, cartpole)
@@ -75,6 +81,13 @@ def main():
 
     plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
     plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
+    
+    # # Call the iLQR function
+    # x_traj_10, u_traj_10, cost_10, F_10, P_10 = iLQR(T, T_s, xu_bar, x0_10_deg, cartpole)
+    # x_traj_30, u_traj_30, cost_30, F_30, P_30 = iLQR(T, T_s, xu_bar, x0_30_deg, cartpole)
+
+    # plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
+    # plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
 
 if __name__ == '__main__':
     main()
