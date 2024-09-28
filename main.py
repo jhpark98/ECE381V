@@ -66,20 +66,26 @@ def main():
     x0_10_deg = np.array([np.deg2rad(10.0), 0.0, 0.0, 0.0]).reshape(-1, 1)
     x0_30_deg = np.array([np.deg2rad(30.0), 0.0, 0.0, 0.0]).reshape(-1, 1)
 
-    LQR = False
+    LQR = True
     iLRR = True
+
+    u_10 = None
+    u_30 = None
 
     # Call the LQR DP function
     if LQR:
         x_traj_10, u_traj_10, cost_10, F_10, P_10 = lqr_dp(T, T_s, x_bar, u_bar, x0_10_deg, cartpole)
         x_traj_30, u_traj_30, cost_30, F_30, P_30 = lqr_dp(T, T_s, x_bar, u_bar, x0_30_deg, cartpole)
 
-        plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
-        plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
+        u_10 = u_traj_10.T
+        u_30 = u_traj_30.T
+        # plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
+        # plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
+        
     if iLRR:
         # Call the iLQR function
-        x_traj_10, u_traj_10, cost_10 = iLQR(T, T_s, x0_10_deg, cartpole)
-        x_traj_30, u_traj_30, cost_30 = iLQR(T, T_s, x0_30_deg, cartpole)
+        x_traj_10, u_traj_10, cost_10 = iLQR(T, T_s, x0_10_deg, u_10, cartpole)
+        x_traj_30, u_traj_30, cost_30 = iLQR(T, T_s, x0_30_deg, u_30, cartpole)
         
         plot_results(x_traj_10, u_traj_10, np.zeros(N+1).reshape(-1, 1), T, T_s)
         plot_results(x_traj_30, u_traj_30, np.zeros(N+1).reshape(-1, 1), T, T_s)
