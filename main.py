@@ -2,8 +2,7 @@ import numpy as np
 from cartpole import CartPole
 from helper import plot_results
 from lqr import lqr_dp
-# from ilqr import iLQR
-# from lqr import ilqr
+from ilqr import iLQR
 
 def forward(x0, u_bar, cartpole, full=True):
 
@@ -29,7 +28,6 @@ def forward(x0, u_bar, cartpole, full=True):
     u_k = u_bar[k].reshape(-1,1) # (1, 1)
 
     if full: # non-linear dynamics
-    #   import pdb; pdb.set_trace()
       x[:, k + 1] = cartpole.next_step(x_k, u_k).reshape(-1,)
     else:    # linearized dynamics
       x_next = A @ x_k + B @ u_k
@@ -44,12 +42,11 @@ def main():
     # NEED TO DEBUG - Make sure forward dynamics & 
     cartpole = CartPole(T_s) # Initialize environment
 
-    x0 = np.array([0.0, 0.0, 0.0, 0.0]).reshape(-1, 1) # initial state (4, 1)
-    u_bar = np.array([0.1] * N).reshape(-1, 1)         # control input (N, 1)
-    u_bar[0, 0] = 0.0
-    x_full = forward(x0, u_bar, cartpole, full=True) # full dynamics
-    x_lin = forward(x0, u_bar, cartpole, full=False) # linear dynamics
-    
+    # x0 = np.array([0.0, 0.0, 0.0, 0.0]).reshape(-1, 1) # initial state (4, 1)
+    # u_bar = np.array([0.1] * N).reshape(-1, 1)         # control input (N, 1)
+    # u_bar[0, 0] = 0.0
+    # x_full = forward(x0, u_bar, cartpole, full=True) # full dynamics
+    # x_lin = forward(x0, u_bar, cartpole, full=False) # linear dynamics
     # plot_results(x_full.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
     # plot_results(x_lin.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
 
@@ -60,34 +57,32 @@ def main():
     # d_dummy = a_dummy * 4.0
     # DUMMY = np.hstack([a_dummy, b_dummy, c_dummy, d_dummy]).reshape(-1, 4)
     # plot_results(DUMMY.reshape(-1, 4), u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
-    # import pdb; pdb.set_trace()
 
 
     # For LQR, start by estimating time-invariant matrices by linearizing the system around 0.
     x_bar, u_bar = np.array([0.0, 0.0, 0.0, 0.0]).reshape(-1, 1), np.array([0.0]).reshape(-1, 1) # Linearizing w.r.t.
 
-    xu_bar = (x_bar, u_bar)
-
     # Initial condition
-    # x0_10_deg = np.array([10.0, 0.0, 0.0, 0.0]).reshape(-1, 1)
-    # x0_30_deg = np.array([30.0, 0.0, 0.0, 0.0]).reshape(-1, 1)
-    
     x0_10_deg = np.array([np.deg2rad(10.0), 0.0, 0.0, 0.0]).reshape(-1, 1)
     x0_30_deg = np.array([np.deg2rad(30.0), 0.0, 0.0, 0.0]).reshape(-1, 1)
 
+    LQR = False
+    iLRR = True
+
     # Call the LQR DP function
-    x_traj_10, u_traj_10, cost_10, F_10, P_10 = lqr_dp(T, T_s, xu_bar, x0_10_deg, cartpole)
-    x_traj_30, u_traj_30, cost_30, F_30, P_30 = lqr_dp(T, T_s, xu_bar, x0_30_deg, cartpole)
+    if LQR:
+        x_traj_10, u_traj_10, cost_10, F_10, P_10 = lqr_dp(T, T_s, x_bar, u_bar, x0_10_deg, cartpole)
+        x_traj_30, u_traj_30, cost_30, F_30, P_30 = lqr_dp(T, T_s, x_bar, u_bar, x0_30_deg, cartpole)
 
-    plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
-    plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
-    
-    # # Call the iLQR function
-    # x_traj_10, u_traj_10, cost_10, F_10, P_10 = iLQR(T, T_s, xu_bar, x0_10_deg, cartpole)
-    # x_traj_30, u_traj_30, cost_30, F_30, P_30 = iLQR(T, T_s, xu_bar, x0_30_deg, cartpole)
-
-    # plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
-    # plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
+        plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
+        plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
+    if iLRR:
+        # Call the iLQR function
+        x_traj_10, u_traj_10, cost_10 = iLQR(T, T_s, x0_10_deg, cartpole)
+        x_traj_30, u_traj_30, cost_30 = iLQR(T, T_s, x0_30_deg, cartpole)
+        
+        plot_results(x_traj_10, u_traj_10, np.zeros(N+1).reshape(-1, 1), T, T_s)
+        plot_results(x_traj_30, u_traj_30, np.zeros(N+1).reshape(-1, 1), T, T_s)
 
 if __name__ == '__main__':
     main()

@@ -152,7 +152,6 @@ def func_f_2(theta, q, theta_dot, q_dot, F):
        J_t*l*m*theta_dot**2*math.sin(theta)/(DET) - 
        g*l**2*m**2*math.sin(theta)*math.cos(theta)/(DET) + 
        gamma*l*m*theta_dot*math.cos(theta)/(DET))
-
     return res
 
 def func_grad_theta_f_1(theta, q, theta_dot, q_dot, F):

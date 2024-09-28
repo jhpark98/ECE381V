@@ -1,8 +1,8 @@
 import numpy as np
 
-"""## Simulate LQR"""
+""" Simulate LQR """
 # def lqr_dp(Q, Q_N, R, T, T_s, xu_N, xu_bar, x_0, cartpole):
-def lqr_dp(T, T_s, xu_bar, x_0, cartpole):
+def lqr_dp(T, T_s, x_bar, u_bar, x_0, cartpole):
     """
     Execute the LQR dynamic programming algorithm for a given system, including terminal state information.
 
@@ -22,9 +22,6 @@ def lqr_dp(T, T_s, xu_bar, x_0, cartpole):
     Q = np.eye(4)
     R = np.eye(1) * 0.1
     N = int(T / T_s)  # Number of time steps = 1000
-
-    # Unpack
-    x_bar, u_bar = xu_bar
 
     # Pre-allocate arrays
     P = [None] * (N + 1)  # Cost-to-go matrices
