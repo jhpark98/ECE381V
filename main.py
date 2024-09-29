@@ -35,7 +35,7 @@ def forward(x0, u_bar, cartpole, full=True):
   return x
 
 def main():
-    T = 10.0   # 10.0 seconds time horizon
+    T = 20.0   # 10.0 seconds time horizon
     T_s = 0.01 # 50 ms sampling time
     N = int(T / T_s)  # number of time steps
 
@@ -84,11 +84,18 @@ def main():
         
     if iLRR:
         # Call the iLQR function
+        
+        N_u10 = u_10.shape[1]
+        for k in range(N_u10):
+            u_10[0:k] = 0.0
+            
+        # import pdb; pdb.set_trace()
+        
         x_traj_10, u_traj_10, cost_10 = iLQR(T, T_s, x0_10_deg, u_10, cartpole)
-        x_traj_30, u_traj_30, cost_30 = iLQR(T, T_s, x0_30_deg, u_30, cartpole)
+        # x_traj_30, u_traj_30, cost_30 = iLQR(T, T_s, x0_30_deg, u_30, cartpole)
         
         plot_results(x_traj_10, u_traj_10, np.zeros(N+1).reshape(-1, 1), T, T_s)
-        plot_results(x_traj_30, u_traj_30, np.zeros(N+1).reshape(-1, 1), T, T_s)
+        # plot_results(x_traj_30, u_traj_30, np.zeros(N+1).reshape(-1, 1), T, T_s)
 
 if __name__ == '__main__':
     main()
