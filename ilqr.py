@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def forward_pass_initial(x0, u_bar, cartpole):
 
     N = u_bar.shape[1]   # Horizon length
@@ -10,11 +11,11 @@ def forward_pass_initial(x0, u_bar, cartpole):
     x_bar[:, 0] = x0.reshape(-1,)
 
     # Forward pass through the horizon
-    for k in range(N):
-        x_bar_k = x_bar[:, k].reshape(-1, 1)
-        u_bar_k = u_bar[:, k].reshape(-1, 1)
-        x_next = cartpole.next_step(x_bar_k, u_bar_k)
-        # x_bar[:, k + 1] = x_next.reshape(-1,)
+    # for k in range(N):
+    #     x_bar_k = x_bar[:, k].reshape(-1, 1)
+    #     u_bar_k = u_bar[:, k].reshape(-1, 1)
+    #     x_next = cartpole.next_step(x_bar_k, u_bar_k)
+    #     x_bar[:, k + 1] = x_next.reshape(-1,) 
     
     return x_bar, u_bar
 
@@ -22,7 +23,7 @@ def forward_pass_initial(x0, u_bar, cartpole):
 def forward_pass(x0, x_bar, u_bar, K, d, cartpole):
     """
     Input:
-        x_bar: 2D array of shape (n, N+1)
+        x_bar: 2D array of shape (n, N + 1)
         u_bar: 2D array of shape (m, N)
     """
 
@@ -44,7 +45,7 @@ def forward_pass(x0, x_bar, u_bar, K, d, cartpole):
         delta_u_k = K[k] @ (x_k - x_bar_k) + d[k]
         u[:, k] = u_bar[:, k] + delta_u_k
         u_k = u[:, k].reshape(-1, 1)
-        x_next = cartpole.next_step(x_k, u_k)
+        x_next = cartpole.next_step(x_k, u_k) # h(x_k, u_k)
         x[:, k + 1] = x_next.reshape(-1,)
     return x, u
 
@@ -71,12 +72,6 @@ def backward_pass(Q_N, Q, R, x_bar, u_bar, cartpole):
 
     for k in range(N - 1, -1, -1):
 
-        # print("V_k: ", V_k[-5:])
-        # print("V_d: ", v_k[-5:])
-        # print("K: ", K[-5:])
-        # print("d: ", d[-5:])
-        # print("-----")
-        
         v_next = v_k[k + 1].reshape(-1, 1)
         V_next = V_k[k + 1]
 
@@ -104,7 +99,7 @@ def backward_pass(Q_N, Q, R, x_bar, u_bar, cartpole):
     return K, d
 
 # iLQR algorithm
-def iLQR(T, T_s, x0, u_bar, cartpole, threshold=1e-4):
+def iLQR(T, T_s, x0, u_bar, cartpole, threshold=1):
     """
     Inputs:
         x0: 2D array of shape (n, 1)
@@ -125,11 +120,14 @@ def iLQR(T, T_s, x0, u_bar, cartpole, threshold=1e-4):
     # Step 1: Initial reference trajectory
     # Forward pass: compute state trajectory for current control sequence
     x_bar, _ = forward_pass_initial(x0, u_bar, cartpole)
-    print("x_bar is", x_bar[0,:])
-    print("u_bar is", u_bar[0,1])
+
+    """
+        Initial setup:
+            x_bar and u_bar are all zeors, except x0 is an initial condition.
+    """
     # import matplotlib.pyplot as plt
     # plt.plot(x_bar.T)
-    # # plt.plot(u_bar.T)
+    # plt.plot(u_bar.T)
     # plt.show()
     # import pdb; pdb.set_trace()
     
@@ -142,56 +140,42 @@ def iLQR(T, T_s, x0, u_bar, cartpole, threshold=1e-4):
         # Step 3: Update control sequence using feedback and feedforward gains
         # We perform a new forward pass to compute the next state and control trajectory
         x_bar, u_bar = forward_pass(x0, x_bar, u_bar, K, d, cartpole)
-        # print("x_bar is", x_bar[0,:])
-        # print("u_bar is", u_bar[0,1])
-        # import pdb; pdb.set_trace()
         
         # import matplotlib.pyplot as plt
         # plt.plot(x_bar.T)
-        # # plt.plot(u_bar.T)
+        # plt.legend(['theta', 'q', 'theta_dot', 'q_dot'], loc='upper left')
+        # # plt.plot(u_bar.T, label='F')
         # plt.show()
         # import pdb; pdb.set_trace()
         
         # Compute the current cost
-        current_cost = compute_cost(x_bar, u_bar, Q, R, Q_N)
+        # current_cost = compute_cost(x_bar, u_bar, Q, R, Q_N)
+        current_cost = (0.5 * x_bar[:, 0].T @ Q @ x_bar[:, 0]) + (0.5 * u_bar[:, 0].T @ R @ u_bar[:, 0])
 
         # Print iteration number and current cost
         print(f"Iteration {iteration + 1}, Cost: {current_cost}")
 
         # Check the difference between the current and previous cost
         cost_diff = abs(current_cost - prev_cost)
-        if (current_cost < 10) and (cost_diff < threshold):
+        if (current_cost < 6000) and (cost_diff < threshold):
             print(f"Converged after {iteration + 1} iterations with cost difference {cost_diff}")
             break  # Exit the loop if cost change is below the threshold
 
         prev_cost = current_cost  # Update the previous cost for the next iteration
         iteration += 1  # Increment the iteration counter
     
-    # J_list = [None] * N        # List to store costs (0 to N)
-    # for k in range(N):
-    #     x_k = x_list[k]
-    #     u_k = F[k] @ x_k
-    #     u_list[k] = u_k
-    #     # xu = (x_k, u_k)
-    #     x_next = cartpole.next_step(x_k, u_k) # x_k+1
-    #     x_list[k+1] = x_next
+    J_list = np.zeros(N+1)
+    for k in range(N):
+        J_list[k] = (0.5 * x_bar[:, k].T @ Q @ x_bar[:, k]) + (0.5 * u_bar[:, k].T @ R @ u_bar[:, k])
+    J_list[N] = (0.5 * x_bar[:, -1].T @ Q_N @ x_bar[:, -1])
 
-    #     # Calculate cost at each step (penalizing deviation from the desired state)
-    #     J_k = 0.5 * (x_k.T @ P[k] @ x_k)
-    #     J_list[k] = J_k
-
-    # # Terminal cost (penalizing deviation from the terminal state)
-    # x_N = x_list[-1].reshape(-1, 1)
-    # J_N = 0.5 * x_N.T @ Q_N @ x_N
-    # J_list.append(J_N)
-
-    return x_bar, u_bar, None
+    return x_bar, u_bar, J_list
 
 # Dummy compute_cost function for illustration (implement according to your specific problem)
-def compute_cost(x, u, Q, R, Q_f):
+def compute_cost(x, u, Q, R, Q_N):
     N = u.shape[1]
     cost = 0
     for k in range(N):
-        cost += 0.5 * x[:, k].T @ Q @ x[:, k] + 0.5 * u[:, k].T @ R @ u[:, k]
-    cost += x[:, -1].T @ Q_f @ x[:, -1]
+        cost += (0.5 * x[:, k].T @ Q @ x[:, k]) + (0.5 * u[:, k].T @ R @ u[:, k])
+    cost += (0.5 * x[:, -1].T @ Q_N @ x[:, -1])
     return cost
