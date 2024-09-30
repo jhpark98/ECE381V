@@ -23,25 +23,6 @@ class CartPole:
         self.g = 9.8      # m/s^2
         self.M_t = self.M + self.m
         self.J_t = self.J + self.m * self.l**2
-        
-        # self.det = 1 / (self.M_t*self.J_t - self.m**2*self.l**2)
-
-        # self.f_1_sym = None
-        # self.f_2_sym = None
-        # self.grad_x_f_1_sym = None
-        # self.grad_x_f_2_sym = None
-        # self.grad_u_f_1_sym = None
-        # self.grad_u_f_2_sym = None
-
-        # self.f_1_val = None
-        # self.f_2_val = None
-        # self.grad_x_f_1_val = None
-        # self.grad_x_f_2_val = None
-        # self.grad_u_f_1_val = None
-        # self.grad_u_f_2_val = None
-
-        # self.find_analytical()
-
 
     def next_step(self, x: np.ndarray, u: np.ndarray) -> np.ndarray:
         """ h(x, u) full, non-linear dynamics """

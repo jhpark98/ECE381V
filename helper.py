@@ -5,7 +5,7 @@ import sympy as sp
 
 """ ---------------------------------------- """
 
-def plot_results(x_traj, u_traj, cost, T, T_s):
+def plot_results(x_traj, u_traj, cost, T, T_s, fname, save=False):
     """
     Plot the results of the LQR solution: state trajectory, control input, and accumulated cost over time.
 
@@ -47,7 +47,12 @@ def plot_results(x_traj, u_traj, cost, T, T_s):
 
     # Adjust layout and show plot
     plt.tight_layout()
-    plt.show()
+
+    if save is True:
+        plt.savefig(fname)
+        print(f"saved {fname} ...")
+    else:    
+        plt.show()
 
 def find_analytical():
     """ def find_f() """

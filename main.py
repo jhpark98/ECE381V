@@ -79,11 +79,8 @@ def main():
     if LQR:
         x_traj_10, u_traj_10, cost_10, F_10, P_10 = lqr_dp(T, T_s, x_bar, u_bar, x0_10_deg, cartpole)
         x_traj_30, u_traj_30, cost_30, F_30, P_30 = lqr_dp(T, T_s, x_bar, u_bar, x0_30_deg, cartpole)
-
-        plot_results(x_traj_10, u_traj_10, cost_10, T, T_s)
-        plt.savefig("LQR_10.png")
-        plot_results(x_traj_30, u_traj_30, cost_30, T, T_s)
-        plt.savefig("LQR_30.png")
+        plot_results(x_traj_10, u_traj_10, cost_10, T, T_s, "LQR_10.png", True)
+        plot_results(x_traj_30, u_traj_30, cost_30, T, T_s, "LQR_30.png", True)
         
     if iLRR:
         u_10 = np.zeros(N).reshape(1, -1)
@@ -92,10 +89,8 @@ def main():
         # Call the iLQR function
         x_traj_10, u_traj_10, cost_10 = iLQR(T, T_s, x0_10_deg, u_10, cartpole)
         x_traj_30, u_traj_30, cost_30 = iLQR(T, T_s, x0_30_deg, u_30, cartpole)
-        plot_results(x_traj_10.T, u_traj_10.T, cost_10.reshape(-1, 1), T, T_s)
-        plt.savefig("iLQR_10.png")
-        plot_results(x_traj_30.T, u_traj_30.T, cost_30.reshape(-1, 1), T, T_s)
-        plt.savefig("iLQR_30.png")
+        plot_results(x_traj_10.T, u_traj_10.T, cost_10.reshape(-1, 1), T, T_s, "iLQR_10.png", True)
+        plot_results(x_traj_30.T, u_traj_30.T, cost_30.reshape(-1, 1), T, T_s, "iLQR_30.png", True)
 
 if __name__ == '__main__':
     main()

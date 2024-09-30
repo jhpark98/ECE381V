@@ -26,7 +26,6 @@ def forward_pass(x0, x_bar, u_bar, K, d, cartpole):
         x_bar: 2D array of shape (n, N + 1)
         u_bar: 2D array of shape (m, N)
     """
-
     N = u_bar.shape[1]   # Horizon length
     n_x = x0.shape[0]    # State dimension
     n_u = u_bar.shape[0] # Control dimension
@@ -56,7 +55,6 @@ def backward_pass(Q_N, Q, R, x_bar, u_bar, cartpole):
         x_bar: 2D array of shape (n, N+1)
         u_bar: 2D array of shape (m, N)
     """
-
     N = u_bar.shape[1]  # Horizon length
 
     # Initialize terminal cost-to-go
@@ -125,44 +123,30 @@ def iLQR(T, T_s, x0, u_bar, cartpole, threshold=1):
         Initial setup:
             x_bar and u_bar are all zeors, except x0 is an initial condition.
     """
-    # import matplotlib.pyplot as plt
-    # plt.plot(x_bar.T)
-    # plt.plot(u_bar.T)
-    # plt.show()
-    # import pdb; pdb.set_trace()
-    
-    while True:
 
-        # Step 2: Backward pass to update control
+    # Start iLQR    
+    while True:
         # Backward pass: compute optimal control updates (feedback K and feedforward d gains)
         K, d = backward_pass(Q_N, Q, R, x_bar, u_bar, cartpole)
 
-        # Step 3: Update control sequence using feedback and feedforward gains
-        # We perform a new forward pass to compute the next state and control trajectory
+        # Forward pass: update control sequence using feedback and feedforward gains
         x_bar, u_bar = forward_pass(x0, x_bar, u_bar, K, d, cartpole)
-        
-        # import matplotlib.pyplot as plt
-        # plt.plot(x_bar.T)
-        # plt.legend(['theta', 'q', 'theta_dot', 'q_dot'], loc='upper left')
-        # # plt.plot(u_bar.T, label='F')
-        # plt.show()
-        # import pdb; pdb.set_trace()
         
         # Compute the current cost
         # current_cost = compute_cost(x_bar, u_bar, Q, R, Q_N)
         current_cost = (0.5 * x_bar[:, 0].T @ Q @ x_bar[:, 0]) + (0.5 * u_bar[:, 0].T @ R @ u_bar[:, 0])
 
         # Print iteration number and current cost
-        print(f"Iteration {iteration + 1}, Cost: {current_cost}")
+        # print(f"Iteration {iteration + 1}, Cost: {current_cost}")
 
         # Check the difference between the current and previous cost
         cost_diff = abs(current_cost - prev_cost)
         if (current_cost < 6000) and (cost_diff < threshold):
             print(f"Converged after {iteration + 1} iterations with cost difference {cost_diff}")
-            break  # Exit the loop if cost change is below the threshold
+            break
 
-        prev_cost = current_cost  # Update the previous cost for the next iteration
-        iteration += 1  # Increment the iteration counter
+        prev_cost = current_cost
+        iteration += 1
     
     J_list = np.zeros(N+1)
     for k in range(N):
@@ -171,7 +155,6 @@ def iLQR(T, T_s, x0, u_bar, cartpole, threshold=1):
 
     return x_bar, u_bar, J_list
 
-# Dummy compute_cost function for illustration (implement according to your specific problem)
 def compute_cost(x, u, Q, R, Q_N):
     N = u.shape[1]
     cost = 0
