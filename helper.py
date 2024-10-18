@@ -22,6 +22,8 @@ def plot_results(x_traj, u_traj, cost, T, T_s, fname, save=False):
 
     fig, axs = plt.subplots(3, 1, figsize=(10, 8))
 
+    # import pdb; pdb.set_trace()
+
   # Plot state vector x
     axs[0].plot(time, x_traj[:, 0], label=r'$\theta$')
     axs[0].plot(time, x_traj[:, 1], label=r'$q$')
@@ -262,4 +264,42 @@ def func_grad_u_f(theta, q, theta_dot, q_dot, F):
     return grad_u_f
 
 # f_1_sym, f_2_sym, grad_x_f_1_sym, grad_x_f_2_sym, grad_u_f_1_sym, grad_u_f_2_sym = find_analytical()
-# import pdb; pdb.set_trace()
+
+def test_forward(N, T, T_s, cartpole):
+    x0 = np.array([0.0, 0.0, 0.0, 0.0]).reshape(-1, 1) # initial state (4, 1)
+    u_bar = np.array([0.1] * N).reshape(-1, 1)         # control input (N, 1)
+    u_bar[0, 0] = 0.0
+    x_full = forward(x0, u_bar, cartpole, full=True) # full dynamics
+    x_lin = forward(x0, u_bar, cartpole, full=False) # linear dynamics
+    plot_results(x_full.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
+    plot_results(x_lin.T, u_bar, np.zeros(N+1).reshape(-1, 1), T, T_s)
+
+def forward(x0, u_bar, cartpole, full=True):
+
+  n_x = x0.shape[0]    # (4, 1)
+
+  # Initialize state trajectory
+  N = len(u_bar)
+  x = np.zeros((n_x, N + 1))
+  x[:, 0] = x0.reshape(-1,) # (4,)
+  
+  x_approx = x0
+  u_approx = u_bar[0,0].reshape(-1, 1)
+  assert x_approx.shape == (4, 1)
+  assert u_approx.shape == (1, 1)
+  
+  A, B = cartpole.approx_A_B(x_approx, u_approx) # Linearized LQR
+
+  # Forward pass through the horizon
+  for k in range(N):
+    # state & action @ time k
+    x_k = x[:, k].reshape(-1,1)  # (4, 1)
+    u_k = u_bar[k].reshape(-1,1) # (1, 1)
+
+    if full: # non-linear dynamics
+      x[:, k + 1] = cartpole.next_step(x_k, u_k).reshape(-1,)
+    else:    # linearized dynamics
+      x_next = A @ x_k + B @ u_k
+      print(f"x_next: {x_next}")
+      x[:, k + 1] = x_next.reshape(-1,)
+  return x

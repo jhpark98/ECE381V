@@ -1,11 +1,10 @@
 import numpy as np
 from typing import Tuple
-import sympy as sp
 
 from helper import func_f_1, func_f_2, func_grad_x_f, func_grad_u_f
 
 class CartPole:
-    def __init__(self, Ts: float):
+    def __init__(self, Q_N, Q, R, Ts: float):
         """Initialize the cartpole environment
         Inputs:
             Ts: float (the simulation step size)
@@ -23,6 +22,12 @@ class CartPole:
         self.g = 9.8      # m/s^2
         self.M_t = self.M + self.m
         self.J_t = self.J + self.m * self.l**2
+
+        self.Q_N = np.eye(4) * 100
+        self.Q   = np.eye(4)
+        self.R   = np.eye(1) * 0.1
+
+        self.A, self.B = self.approx_A_B(np.zeros((4, 1)), np.zeros((1, 1)))
 
     def next_step(self, x: np.ndarray, u: np.ndarray) -> np.ndarray:
         """ h(x, u) full, non-linear dynamics """

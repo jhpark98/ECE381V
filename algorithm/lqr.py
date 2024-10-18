@@ -1,8 +1,7 @@
 import numpy as np
 
 """ Simulate LQR """
-# def lqr_dp(Q, Q_N, R, T, T_s, xu_N, xu_bar, x_0, cartpole):
-def lqr_dp(T, T_s, x_bar, u_bar, x_0, cartpole):
+def LQR(T, T_s, x_bar, u_bar, x_0, cartpole):
     """
     Execute the LQR dynamic programming algorithm for a given system, including terminal state information.
 
@@ -18,9 +17,10 @@ def lqr_dp(T, T_s, x_bar, u_bar, x_0, cartpole):
     J_list (list): List of costs over time.
     """
 
-    Q_N = np.eye(4) * 100
-    Q = np.eye(4)
-    R = np.eye(1) * 0.1
+    # Cost matrices
+    Q_N = cartpole.Q_N
+    Q = cartpole.Q
+    R = cartpole.R
     N = int(T / T_s)  # Number of time steps = 1000
 
     # Pre-allocate arrays
@@ -51,7 +51,8 @@ def lqr_dp(T, T_s, x_bar, u_bar, x_0, cartpole):
         x_list[k+1] = x_next
 
         # Calculate cost at each step (penalizing deviation from the desired state)
-        J_k = 0.5 * (x_k.T @ P[k] @ x_k)
+        # J_k = 0.5 * (x_k.T @ P[k] @ x_k)
+        J_k = 0.5 * (x_k.T @ Q @ x_k + u_k.T @ R @ u_k)
         J_list[k] = J_k
 
     # Terminal cost (penalizing deviation from the terminal state)
