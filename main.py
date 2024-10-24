@@ -37,25 +37,25 @@ def main():
 
     # Call the LQR DP function
     if run_LQR:
-        x_traj_10, u_traj_10, cost_10, _, _ = LQR(T, T_s, x_bar, u_bar, x0_10_deg, cartpole)
-        x_traj_30, u_traj_30, cost_30, _, _ = LQR(T, T_s, x_bar, u_bar, x0_30_deg, cartpole)
-        plot_results(x_traj_10, u_traj_10, cost_10, T, T_s, "results/LQR_10.png", True)
-        plot_results(x_traj_30, u_traj_30, cost_30, T, T_s, "results/LQR_30.png", True)
+        x_traj_10, u_traj_10, c_10, _, _ = LQR(T, T_s, x_bar, u_bar, x0_10_deg, cartpole)
+        x_traj_30, u_traj_30, c_30, _, _ = LQR(T, T_s, x_bar, u_bar, x0_30_deg, cartpole)
+        plot_results(x_traj_10, u_traj_10, c_10, T, T_s, "results/LQR_10.png", True)
+        plot_results(x_traj_30, u_traj_30, c_30, T, T_s, "results/LQR_30.png", True)
         
     if run_iLRR:
         u_10 = np.zeros(N).reshape(1, -1)
         u_30 = np.zeros(N).reshape(1, -1)
         # Call the iLQR function
-        x_traj_10, u_traj_10, cost_10 = iLQR(T, T_s, x0_10_deg, u_10, cartpole)
-        x_traj_30, u_traj_30, cost_30 = iLQR(T, T_s, x0_30_deg, u_30, cartpole)
-        plot_results(x_traj_10.T, u_traj_10.T, cost_10.reshape(-1, 1), T, T_s, "results/iLQR_10.png", True)
-        plot_results(x_traj_30.T, u_traj_30.T, cost_30.reshape(-1, 1), T, T_s, "results/iLQR_30.png", True)
+        x_traj_10, u_traj_10, c_10 = iLQR(T, T_s, x0_10_deg, u_10, cartpole)
+        x_traj_30, u_traj_30, c_30 = iLQR(T, T_s, x0_30_deg, u_30, cartpole)
+        plot_results(x_traj_10.T, u_traj_10.T, c_10.reshape(-1, 1), T, T_s, "results/iLQR_10.png", True)
+        plot_results(x_traj_30.T, u_traj_30.T, c_30.reshape(-1, 1), T, T_s, "results/iLQR_30.png", True)
     
     if run_QP:
-        x_traj_10, u_traj_10, cost_10 = QP(T, T_s, x0_10_deg, cartpole)
-        x_traj_30, u_traj_30, cost_30 = QP(T, T_s, x0_30_deg, cartpole)
-        plot_results(x_traj_10, u_traj_10, cost_10.reshape(-1, 1), T, T_s, "results/QP_10.png", True)
-        plot_results(x_traj_30, u_traj_30, cost_30.reshape(-1, 1), T, T_s, "results/QP_30.png", True)
+        x_traj_10, u_traj_10, c_10 = QP(T, T_s, x0_10_deg, cartpole)
+        x_traj_30, u_traj_30, c_30 = QP(T, T_s, x0_30_deg, cartpole)
+        plot_results(x_traj_10, u_traj_10, c_10.reshape(-1, 1), T, T_s, "results/QP_10.png", True)
+        plot_results(x_traj_30, u_traj_30, c_30.reshape(-1, 1), T, T_s, "results/QP_30.png", True)
 
 if __name__ == '__main__':
     main()

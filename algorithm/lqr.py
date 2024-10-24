@@ -29,7 +29,7 @@ def LQR(T, T_s, x_bar, u_bar, x_0, cartpole):
     x_list = [None] * (N + 1)  # List to store states (0 to N)
     x_list[0] = x_0
     u_list = [None] * N        # List to store control inputs (0 to N - 1)
-    J_list = [None] * N        # List to store costs (0 to N)
+    C_list = [None] * N        # List to store costs (0 to N)
 
     A, B = cartpole.approx_A_B(x_bar, u_bar)
 
@@ -51,17 +51,17 @@ def LQR(T, T_s, x_bar, u_bar, x_0, cartpole):
         x_list[k+1] = x_next
 
         # Calculate cost at each step (penalizing deviation from the desired state)
-        # J_k = 0.5 * (x_k.T @ P[k] @ x_k)
-        J_k = 0.5 * (x_k.T @ Q @ x_k + u_k.T @ R @ u_k)
-        J_list[k] = J_k
+        # C_k = 0.5 * (x_k.T @ P[k] @ x_k) # optimal cost-to-go (meaning, for t horizon)
+        C_k = 0.5 * (x_k.T @ Q @ x_k + u_k.T @ R @ u_k) # per-step cost -> J_k+1 - J_k
+        C_list[k] = C_k
 
     # Terminal cost (penalizing deviation from the terminal state)
     x_N = x_list[-1].reshape(-1, 1)
-    J_N = 0.5 * x_N.T @ Q_N @ x_N
-    J_list.append(J_N)
+    C_N = 0.5 * x_N.T @ Q_N @ x_N
+    C_list.append(C_N)
 
     x_list = np.hstack(x_list).T
     u_list = np.vstack(u_list)
-    J_list = np.vstack(J_list)
+    C_list = np.vstack(C_list)
 
-    return x_list, u_list, J_list, F, P
+    return x_list, u_list, C_list, F, P
