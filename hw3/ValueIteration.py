@@ -26,7 +26,7 @@ class ValueIteration():
     def get_results(self, save=False):
         # self.grid = self.value_table[::-1]
         self.grid = self.value_table
-        print('\n'.join(' '.join(f"{x:.2f}" for x in row) for row in self.grid)) # grid view
+        # print('\n'.join(' '.join(f"{x:.2f}" for x in row) for row in self.grid)) # grid view
         optimal_value_PI = self.grid
         optimal_policy_PI = self.update_policy_table()
         return optimal_value_PI, optimal_policy_PI
@@ -88,7 +88,7 @@ class ValueIteration():
             self.iter_value += 1
             converged = self.check_value_convergence(epsilon)
 
-        print("----- ----- Summary ----- -----")
+        # print("----- ----- Summary ----- -----")
         print(f"{self.iter_value} sweeps over the state space requried for convergence.")
         # print(f"Value table converged at {self.iter_value}")
 

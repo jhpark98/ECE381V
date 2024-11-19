@@ -129,7 +129,7 @@ class PolicyIteration():
             converged_policy = self.check_policy_convergence()
             converged_value = False
         
-        print("----- ----- Summary of Policy Iteration ----- -----")
+        # print("----- ----- Summary of Policy Iteration ----- -----")
         print(f"{self.iter_value} sweeps over the state space requried for convergence.")
 
     def simulate(self):
