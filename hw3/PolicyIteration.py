@@ -62,32 +62,61 @@ class PolicyIteration():
     
     ''' Main Function '''
 
+    # def update_value_table(self):
+    #     ''' Policy Evaluation
+    #         with fixed current policy, update value table once with simplified Bellman updates until convergence
+    #     '''
+
+    #     next_value_table = np.zeros((self.env.WIDTH, self.env.HEIGHT)) # initialize
+
+    #     # compute Bellman optimality equation for all states
+    #     for state in self.env.get_all_states():
+
+    #         if tuple(state) == tuple(self.env.goal):
+    #             # value for terminal state = 0
+    #             next_value_table[state[0]][state[1]] = 0.0
+    #             continue # terminal state reached. no action needed.
+    #         value_lst = []
+    #         for action in self.env.possible_actions: # (0,1,2,3)
+    #             next_state_lst = self.possible_next_states(state)
+    #             reward = np.array([self.env.get_reward(next_state) for next_state in next_state_lst]) # (4,)
+    #             next_value = np.array([self.get_value(next_state) for next_state in next_state_lst]) # (4,)
+    #             value_lst.append(np.sum(self.env.TP[action] * self.policy_table[state[0]][state[1]] * (reward + self.discount_factor * next_value)))
+    #         next_value_table[state[0]][state[1]] = max(value_lst)
+        
+    #     self.prev_value_table = self.value_table # update old value
+    #     self.value_table = next_value_table      # update new value
+        
     def update_value_table(self):
         ''' Policy Evaluation
-            with fixed current policy, update value table once with simplified Bellman updates until convergence
+            Update value table using the current policy until convergence
         '''
+        next_value_table = np.zeros((self.env.WIDTH, self.env.HEIGHT))  # initialize
 
-        next_value_table = np.zeros((self.env.WIDTH, self.env.HEIGHT)) # initialize
-
-        # compute Bellman optimality equation for all states
+        # compute value function under current policy
         for state in self.env.get_all_states():
-
             if tuple(state) == tuple(self.env.goal):
                 # value for terminal state = 0
                 next_value_table[state[0]][state[1]] = 0.0
-                continue # terminal state reached. no action needed.
-            value_lst = []
-            for action in self.env.possible_actions: # (0,1,2,3)
+                continue  # terminal state reached. no action needed.
+
+            value = 0.0
+            for action in self.env.possible_actions:  # (0,1,2,3)
+                pi_s_a = self.policy_table[state[0]][state[1]][action]
+                if pi_s_a == 0:
+                    continue  # skip actions not in the policy
+                # Get possible next states and their probabilities
                 next_state_lst = self.possible_next_states(state)
-                reward = np.array([self.env.get_reward(next_state) for next_state in next_state_lst]) # (4,)
-                next_value = np.array([self.get_value(next_state) for next_state in next_state_lst]) # (4,)
-                value_lst.append(np.sum(self.env.TP[action] * self.policy_table[state[0]][state[1]] * (reward + self.discount_factor * next_value)))
-            next_value_table[state[0]][state[1]] = max(value_lst)
-        
-        self.prev_value_table = self.value_table # update old value
-        self.value_table = next_value_table      # update new value
-        
-        # return next_value_table
+                reward = np.array([self.env.get_reward(next_state) for next_state in next_state_lst])  # (4,)
+                next_value = np.array([self.get_value(next_state) for next_state in next_state_lst])  # (4,)
+                # Expected value over next states
+                expected_value = np.sum(self.env.TP[action] * (reward + self.discount_factor * next_value))
+                value += pi_s_a * expected_value  # weighted by policy probability
+
+            next_value_table[state[0]][state[1]] = value
+
+        self.prev_value_table = self.value_table  # update old value
+        self.value_table = next_value_table       # update new value
 
     def update_policy_table(self):
         ''' Policy Improvement
