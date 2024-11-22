@@ -1,8 +1,4 @@
-import random
 import numpy as np
-
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 class PolicyIteration():
     """ Use Policy Iteration to compute optimal policy and value function
@@ -159,11 +155,27 @@ class PolicyIteration():
             converged_value = False
         
         # print("----- ----- Summary of Policy Iteration ----- -----")
-        print(f"{self.iter_value} sweeps over the state space requried for convergence.")
+        print(f"{self.iter_value} sweeps over the state space required for convergence.")
 
-    def simulate(self):
-        """ running simulation """
-        pass
-    
+    def simulate(self, start):
+        ''' at each state, follow the optimal policy until the goal state is reached '''
+        
+        cur_state = start
+        goal = self.env.goal
+
+        trajectory = []
+        trajectory.append(cur_state)
+        while cur_state != tuple(goal):
+            action = np.argmax(self.policy_table[cur_state[0]][cur_state[1]])
+            next_state = self.env.next_state(cur_state, action) # stochastic
+            cur_state = tuple(next_state) # update
+            trajectory.append(cur_state)
+        
+        
+        print(f"Goal {goal} is reached.")
+        print("Finish simulation ...")
+        
+        return trajectory
+        
     def get_results(self):
         return self.value_table, self.policy_table

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ''' Visualization '''
-def gen_heatmap_value(value_table, policy_table, plot=False, save=False, name="policy_iteration_value.png", title="Policy Iteration"):
+def gen_heatmap_value(value_table, policy_table, trajectory, plot=False, save=False, name="policy_iteration_value.png", title="Policy Iteration"):
 
     grid_value = value_table[::-1, :]
     grid_policy = policy_table[::-1, :, :]
@@ -41,8 +41,23 @@ def gen_heatmap_value(value_table, policy_table, plot=False, save=False, name="p
     plt.title(title, fontsize=10, fontweight='bold')
     plt.xlabel("X-axis", fontsize=9)
     plt.ylabel("Y-axis", fontsize=9)
-    # Remove inversion of y-axis to match coordinate system
-    # plt.gca().invert_yaxis()
+    
+    # Draw trajectory on the heatmap
+    for i in range(len(trajectory) - 1):
+        start = trajectory[i]
+        end = trajectory[i + 1]
+
+        # Reverse the y-coordinate for grid visualization
+        start_y = grid_value.shape[0] - 1 - start[0]
+        end_y = grid_value.shape[0] - 1 - end[0]
+
+        # Draw a red line between the consecutive trajectory points
+        plt.plot([start[1], end[1]], [start_y, end_y], color='red', linewidth=2, label="Trajectory" if i == 0 else "")
+
+    # Add a legend for the trajectory
+    plt.legend(loc='upper left', fontsize=8)
+
+    ''' Add arrows showing policy
 
     # Overlay arrows to show optimal actions
     n = value_table.shape[0]
@@ -91,6 +106,7 @@ def gen_heatmap_value(value_table, policy_table, plot=False, save=False, name="p
 
 
     plt.quiver(X_arrow, Y_arrow, U, V, angles='xy', scale_units='xy', scale=1, color='red', width=0.003)
+    '''
 
     # Plot or save the figure based on parameters
     if plot:

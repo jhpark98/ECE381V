@@ -77,6 +77,7 @@ class ValueIteration():
             self.policy_table = next_policy_table
 
         return self.policy_table
+        
 
     ''' Run and Simulate '''
     def run(self, epsilon):
@@ -89,22 +90,28 @@ class ValueIteration():
             converged = self.check_value_convergence(epsilon)
 
         # print("----- ----- Summary ----- -----")
-        print(f"{self.iter_value} sweeps over the state space requried for convergence.")
+        print(f"{self.iter_value} sweeps over the state space required for convergence.")
         # print(f"Value table converged at {self.iter_value}")
 
-    def simulate(self):
+    def simulate(self, start):
         ''' at each state, follow the optimal policy until the goal state is reached '''
         
-        cur_state = self.start
+        cur_state = start
         goal = self.env.goal
 
         trajectory = []
         trajectory.append(cur_state)
-        while cur_state != goal:
-            action = self.optimal_policy[cur_state[0]][cur_state[1]]
-            next_state = self.next_state(cur_state, action) # stochastic
-            cur_state = next_state # update
-            trajectory(cur_state)
+        while cur_state != tuple(goal):
+            action = np.argmax(self.policy_table[cur_state[0]][cur_state[1]])
+            next_state = self.env.next_state(cur_state, action) # stochastic
+            cur_state = tuple(next_state) # update
+            trajectory.append(cur_state)
+        
+        
+        print(f"Goal {goal} is reached.")
+        print("Finish simulation ...")
+        
+        return trajectory
     
     ''' Visualization '''
     def gen_heatmap_value(self, plot=False, save=False, name="heatmap_value.png"):

@@ -1,3 +1,4 @@
+import random 
 import numpy as np
 
 class Environment:
@@ -30,6 +31,13 @@ class Environment:
         x = (0 if state[0] < 0 else self.WIDTH - 1 if state[0] > self.WIDTH - 1 else state[0])
         y = (0 if state[1] < 0 else self.HEIGHT - 1 if state[1] > self.HEIGHT - 1 else state[1])
         return np.array((x, y))
+
+    def next_state(self, state, action):
+        self.possible_actions = [0, 1, 2, 3]
+        probabilities = self.TP[action]
+        stochastic_action = random.choices(self.possible_actions, probabilities)[0]
+        
+        return self.check_boundary(state + self.actions_xy[stochastic_action])
 
     def state_after_action(self, state, action):
         """Given state and action pair, return the next state
